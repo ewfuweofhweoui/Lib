@@ -7,13 +7,13 @@ local RunService = game:GetService("RunService")
 local Neverwin = {}
 Neverwin.__index = Neverwin
 
--- Internal Icon Mapping (High compatibility)
+-- Internal Icon Mapping (Hyper-Stable Standard Assets)
 Neverwin.Icons = {
-    ["combat"] = "rbxassetid://6035043834",
+    ["combat"] = "rbxassetid://6031068433",
     ["anti aim"] = "rbxassetid://6031094678",
     ["legitbot"] = "rbxassetid://6034502360",
     ["players"] = "rbxassetid://6031289129",
-    ["weapon"] = "rbxassetid://6034458315",
+    ["weapon"] = "rbxassetid://6034401257",
     ["world"] = "rbxassetid://6035213600",
     ["local player"] = "rbxassetid://6034287525",
     ["scripts"] = "rbxassetid://6034825229",
@@ -36,6 +36,10 @@ end
 function Neverwin.new(title)
     local self = setmetatable({}, Neverwin)
     self.LayoutCount = 0
+
+    -- Clear existing Neverwin GUIs to prevent ghosting
+    local old = (gethui and gethui():FindFirstChild("Neverwin")) or CoreGui:FindFirstChild("Neverwin")
+    if old then old:Destroy() end
 
     self.ScreenGui = Create("ScreenGui", {
         Name = "Neverwin",
@@ -96,6 +100,14 @@ function Neverwin.new(title)
         Create("UIPadding", { PaddingTop = UDim.new(0, 10) })
     })
 
+    self.Content = Create("Frame", {
+        Name = "Content",
+        Parent = self.Main,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 160, 0, 0),
+        Size = UDim2.new(1, -160, 1, 0)
+    })
+
     self.UserProfile = Create("Frame", {
         Name = "UserProfile",
         Parent = self.Sidebar,
@@ -124,14 +136,6 @@ function Neverwin.new(title)
         TextColor3 = Color3.fromRGB(200, 200, 200),
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left
-    })
-
-    self.Content = Create("Frame", {
-        Name = "Content",
-        Parent = self.Main,
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 160, 0, 0),
-        Size = UDim2.new(1, -160, 1, 0)
     })
 
     self.TabFrames = {}
@@ -193,8 +197,7 @@ end
 function Neverwin:CreateTab(name, icon)
     self.LayoutCount = self.LayoutCount + 1
     local tab = {}
-    tab.Active = false
-
+    
     local lookName = string.lower(string.gsub(name, "^%s*(.-)%s*$", "%1"))
     icon = icon or Neverwin.Icons[lookName] or "rbxassetid://6031763426"
 
@@ -459,13 +462,14 @@ function Neverwin:CreateCharacterPreview()
     local preview = Create("Frame", {
         Name = "CharacterPreview",
         Parent = self.ScreenGui,
-        BackgroundColor3 = Color3.fromRGB(15, 15, 15), -- Slightly lighter for header distinction
+        BackgroundColor3 = Color3.fromRGB(15, 15, 15),
         Position = UDim2.new(windowPos.X.Scale, windowPos.X.Offset + 610, windowPos.Y.Scale, windowPos.Y.Offset),
-        Size = UDim2.new(0, 200, 0, 400), -- Same height as main window
-        BorderSizePixel = 0
+        Size = UDim2.new(0, 200, 0, 400),
+        BorderSizePixel = 0,
+        ZIndex = 5
     }, {
         Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
-        Create("TextLabel", { -- Header
+        Create("TextLabel", {
             Name = "Header",
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 0, 0, 10),
@@ -473,7 +477,8 @@ function Neverwin:CreateCharacterPreview()
             Font = Enum.Font.GothamBold,
             Text = "PREVIEW",
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextSize = 14
+            TextSize = 14,
+            ZIndex = 6
         })
     })
 
@@ -483,18 +488,20 @@ function Neverwin:CreateCharacterPreview()
         Parent = preview,
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 0, 0, 40),
-        Size = UDim2.new(1, 0, 1, -40)
+        Size = UDim2.new(1, 0, 1, -40),
+        ZIndex = 6
     })
 
     local cam = Instance.new("Camera")
     viewport.CurrentCamera = cam
     cam.Parent = viewport
-    cam.CFrame = CFrame.new(0, 0, 8)
+    -- Point camera at the character and back it up
+    cam.CFrame = CFrame.new(Vector3.new(0, 0.5, 9), Vector3.new(0, 0.5, 0))
 
     local baconId = 45184511
     local model = Players:CreateHumanoidModelFromUserId(baconId)
     model.Parent = viewport
-    model:SetPrimaryPartCFrame(CFrame.new(0, 0, 0) * CFrame.Angles(0, math.rad(180), 0))
+    model:SetPrimaryPartCFrame(CFrame.new(Vector3.new(0, 0, 0)) * CFrame.Angles(0, math.rad(180), 0))
 
     local rotating = false
     local lastMousePos
@@ -512,7 +519,7 @@ function Neverwin:CreateCharacterPreview()
             local delta = input.Position.X - lastMousePos
             lastMousePos = input.Position.X
             rotation = rotation - delta
-            model:SetPrimaryPartCFrame(CFrame.new(0, 0, 0) * CFrame.Angles(0, math.rad(rotation), 0))
+            model:SetPrimaryPartCFrame(CFrame.new(Vector3.new(0, 0, 0)) * CFrame.Angles(0, math.rad(rotation), 0))
         end
     end)
 
