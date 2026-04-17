@@ -7,6 +7,19 @@ local RunService = game:GetService("RunService")
 local Neverwin = {}
 Neverwin.__index = Neverwin
 
+-- Internal Icon Mapping
+Neverwin.Icons = {
+    ["Combat"] = "rbxassetid://10723345440",
+    ["Anti Aim"] = "rbxassetid://10734950309",
+    ["Legitbot"] = "rbxassetid://10734991192",
+    ["Players"] = "rbxassetid://10747373176",
+    ["Weapon"] = "rbxassetid://10734923239",
+    ["World"] = "rbxassetid://10734947300",
+    ["Local Player"] = "rbxassetid://10747373176",
+    ["Scripts"] = "rbxassetid://10734981358",
+    ["Config"] = "rbxassetid://10734996912",
+}
+
 local function Create(class, properties, children)
     local element = Instance.new(class)
     for i, v in pairs(properties) do
@@ -182,6 +195,9 @@ function Neverwin:CreateTab(name, icon)
     local tab = {}
     tab.Active = false
 
+    -- Use internal mapping if no icon is specified
+    icon = icon or Neverwin.Icons[name] or "rbxassetid://6031763426"
+
     local button = Create("TextButton", {
         Name = name,
         Parent = self.TabsContainer,
@@ -207,7 +223,7 @@ function Neverwin:CreateTab(name, icon)
         Parent = btnContent,
         BackgroundTransparency = 1,
         Size = UDim2.new(0, 16, 0, 16),
-        Image = icon or "rbxassetid://6031763426",
+        Image = icon,
         ImageColor3 = Color3.fromRGB(0, 170, 255)
     })
 
@@ -453,7 +469,7 @@ function Neverwin:CreateCharacterPreview()
 
     self.CharacterPreviewWindow = preview
 
-    local viewport = Create("viewportFrame", {
+    local viewport = Create("ViewportFrame", {
         Parent = preview,
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 1, 0)
