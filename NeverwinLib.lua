@@ -7,17 +7,17 @@ local RunService = game:GetService("RunService")
 local Neverwin = {}
 Neverwin.__index = Neverwin
 
--- Internal Icon Mapping (Using reliable public asset IDs)
+-- Internal Icon Mapping (High compatibility)
 Neverwin.Icons = {
-    ["Combat"] = "rbxassetid://6031068433",
-    ["Anti Aim"] = "rbxassetid://6031094678",
-    ["Legitbot"] = "rbxassetid://6034502360",
-    ["Players"] = "rbxassetid://6031289129",
-    ["Weapon"] = "rbxassetid://6035145364",
-    ["World"] = "rbxassetid://6035213600",
-    ["Local Player"] = "rbxassetid://6034287525",
-    ["Scripts"] = "rbxassetid://6034825229",
-    ["Config"] = "rbxassetid://6035151525",
+    ["combat"] = "rbxassetid://6035043834",
+    ["anti aim"] = "rbxassetid://6031094678",
+    ["legitbot"] = "rbxassetid://6034502360",
+    ["players"] = "rbxassetid://6031289129",
+    ["weapon"] = "rbxassetid://6034458315",
+    ["world"] = "rbxassetid://6035213600",
+    ["local player"] = "rbxassetid://6034287525",
+    ["scripts"] = "rbxassetid://6034825229",
+    ["config"] = "rbxassetid://6035151525",
 }
 
 local function Create(class, properties, children)
@@ -195,7 +195,8 @@ function Neverwin:CreateTab(name, icon)
     local tab = {}
     tab.Active = false
 
-    icon = icon or Neverwin.Icons[name] or "rbxassetid://6031763426"
+    local lookName = string.lower(string.gsub(name, "^%s*(.-)%s*$", "%1"))
+    icon = icon or Neverwin.Icons[lookName] or "rbxassetid://6031763426"
 
     local button = Create("TextButton", {
         Name = name,
@@ -458,12 +459,22 @@ function Neverwin:CreateCharacterPreview()
     local preview = Create("Frame", {
         Name = "CharacterPreview",
         Parent = self.ScreenGui,
-        BackgroundColor3 = Color3.fromRGB(10, 10, 10),
+        BackgroundColor3 = Color3.fromRGB(15, 15, 15), -- Slightly lighter for header distinction
         Position = UDim2.new(windowPos.X.Scale, windowPos.X.Offset + 610, windowPos.Y.Scale, windowPos.Y.Offset),
-        Size = UDim2.new(0, 200, 0, 300),
+        Size = UDim2.new(0, 200, 0, 400), -- Same height as main window
         BorderSizePixel = 0
     }, {
-        Create("UICorner", { CornerRadius = UDim.new(0, 8) })
+        Create("UICorner", { CornerRadius = UDim.new(0, 8) }),
+        Create("TextLabel", { -- Header
+            Name = "Header",
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0, 10),
+            Size = UDim2.new(1, 0, 0, 30),
+            Font = Enum.Font.GothamBold,
+            Text = "PREVIEW",
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextSize = 14
+        })
     })
 
     self.CharacterPreviewWindow = preview
@@ -471,13 +482,14 @@ function Neverwin:CreateCharacterPreview()
     local viewport = Create("ViewportFrame", {
         Parent = preview,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 1, 0)
+        Position = UDim2.new(0, 0, 0, 40),
+        Size = UDim2.new(1, 0, 1, -40)
     })
 
     local cam = Instance.new("Camera")
     viewport.CurrentCamera = cam
     cam.Parent = viewport
-    cam.CFrame = CFrame.new(0, 1, 5)
+    cam.CFrame = CFrame.new(0, 0, 8)
 
     local baconId = 45184511
     local model = Players:CreateHumanoidModelFromUserId(baconId)
