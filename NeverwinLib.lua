@@ -7,17 +7,17 @@ local RunService = game:GetService("RunService")
 local Neverwin = {}
 Neverwin.__index = Neverwin
 
--- Internal Icon Mapping
+-- Internal Icon Mapping (Using reliable public asset IDs)
 Neverwin.Icons = {
-    ["Combat"] = "rbxassetid://10723345440",
-    ["Anti Aim"] = "rbxassetid://10734950309",
-    ["Legitbot"] = "rbxassetid://10734991192",
-    ["Players"] = "rbxassetid://10747373176",
-    ["Weapon"] = "rbxassetid://10734923239",
-    ["World"] = "rbxassetid://10734947300",
-    ["Local Player"] = "rbxassetid://10747373176",
-    ["Scripts"] = "rbxassetid://10734981358",
-    ["Config"] = "rbxassetid://10734996912",
+    ["Combat"] = "rbxassetid://6031068433",
+    ["Anti Aim"] = "rbxassetid://6031094678",
+    ["Legitbot"] = "rbxassetid://6034502360",
+    ["Players"] = "rbxassetid://6031289129",
+    ["Weapon"] = "rbxassetid://6035145364",
+    ["World"] = "rbxassetid://6035213600",
+    ["Local Player"] = "rbxassetid://6034287525",
+    ["Scripts"] = "rbxassetid://6034825229",
+    ["Config"] = "rbxassetid://6035151525",
 }
 
 local function Create(class, properties, children)
@@ -195,7 +195,6 @@ function Neverwin:CreateTab(name, icon)
     local tab = {}
     tab.Active = false
 
-    -- Use internal mapping if no icon is specified
     icon = icon or Neverwin.Icons[name] or "rbxassetid://6031763426"
 
     local button = Create("TextButton", {
