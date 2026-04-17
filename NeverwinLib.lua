@@ -7,17 +7,17 @@ local RunService = game:GetService("RunService")
 local Neverwin = {}
 Neverwin.__index = Neverwin
 
--- Internal Icon Mapping (Hyper-Stable Standard Assets)
+-- Internal Icon Mapping (Modern stable Feather Icons)
 Neverwin.Icons = {
-    ["combat"] = "rbxassetid://6031068433",
-    ["anti aim"] = "rbxassetid://6031094678",
-    ["legitbot"] = "rbxassetid://6034502360",
-    ["players"] = "rbxassetid://6031289129",
-    ["weapon"] = "rbxassetid://6034401257",
-    ["world"] = "rbxassetid://6035213600",
-    ["local player"] = "rbxassetid://6034287525",
-    ["scripts"] = "rbxassetid://6034825229",
-    ["config"] = "rbxassetid://6035151525",
+    ["combat"] = "rbxassetid://7733956134",
+    ["anti aim"] = "rbxassetid://7734044557",
+    ["legitbot"] = "rbxassetid://7734053153",
+    ["players"] = "rbxassetid://7734042854",
+    ["weapon"] = "rbxassetid://7743869054",
+    ["world"] = "rbxassetid://7734010488",
+    ["local player"] = "rbxassetid://7734042854",
+    ["scripts"] = "rbxassetid://7733955740",
+    ["config"] = "rbxassetid://7734053426",
 }
 
 local function Create(class, properties, children)
@@ -37,7 +37,7 @@ function Neverwin.new(title)
     local self = setmetatable({}, Neverwin)
     self.LayoutCount = 0
 
-    -- Clear existing Neverwin GUIs to prevent ghosting
+    -- Clear existing Neverwin GUIs to prevent overlap
     local old = (gethui and gethui():FindFirstChild("Neverwin")) or CoreGui:FindFirstChild("Neverwin")
     if old then old:Destroy() end
 
@@ -227,7 +227,7 @@ function Neverwin:CreateTab(name, icon)
         BackgroundTransparency = 1,
         Size = UDim2.new(0, 16, 0, 16),
         Image = icon,
-        ImageColor3 = Color3.fromRGB(0, 170, 255)
+        ImageColor3 = Color3.fromRGB(180, 180, 180) -- Default to gray, will turn blue when active
     })
 
     local textLabel = Create("TextLabel", {
@@ -453,7 +453,7 @@ function Neverwin:SelectTab(name)
         local isCurrent = t.button.Name == name
         t.container.Visible = isCurrent
         TweenService:Create(t.label, TweenInfo.new(0.2), { TextColor3 = isCurrent and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 180) }):Play()
-        TweenService:Create(t.icon, TweenInfo.new(0.2), { ImageColor3 = isCurrent and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(0, 170, 255) }):Play()
+        TweenService:Create(t.icon, TweenInfo.new(0.2), { ImageColor3 = isCurrent and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(180, 180, 180) }):Play()
     end
 end
 
@@ -487,16 +487,16 @@ function Neverwin:CreateCharacterPreview()
     local viewport = Create("ViewportFrame", {
         Parent = preview,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 0, 0, 40),
-        Size = UDim2.new(1, 0, 1, -40),
+        Position = UDim2.new(0, 10, 0, 50),
+        Size = UDim2.new(1, -20, 1, -60),
         ZIndex = 6
     })
 
     local cam = Instance.new("Camera")
     viewport.CurrentCamera = cam
     cam.Parent = viewport
-    -- Point camera at the character and back it up
-    cam.CFrame = CFrame.new(Vector3.new(0, 0.5, 9), Vector3.new(0, 0.5, 0))
+    -- Point camera at the character and pull BACK further
+    cam.CFrame = CFrame.new(Vector3.new(0, 1.2, 11), Vector3.new(0, 0.5, 0))
 
     local baconId = 45184511
     local model = Players:CreateHumanoidModelFromUserId(baconId)
