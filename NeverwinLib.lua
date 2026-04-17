@@ -7,17 +7,17 @@ local RunService = game:GetService("RunService")
 local Neverwin = {}
 Neverwin.__index = Neverwin
 
--- Internal Icon Mapping (Modern stable Feather Icons)
+-- Internal Icon Mapping (Unicode symbols for absolute stability - NO ASSETS REQUIRED)
 Neverwin.Icons = {
-    ["combat"] = "rbxassetid://7733956134",
-    ["anti aim"] = "rbxassetid://7734044557",
-    ["legitbot"] = "rbxassetid://7734053153",
-    ["players"] = "rbxassetid://7734042854",
-    ["weapon"] = "rbxassetid://7743869054",
-    ["world"] = "rbxassetid://7734010488",
-    ["local player"] = "rbxassetid://7734042854",
-    ["scripts"] = "rbxassetid://7733955740",
-    ["config"] = "rbxassetid://7734053426",
+    ["combat"] = "⌖",
+    ["anti aim"] = "↺",
+    ["legitbot"] = "🛡",
+    ["players"] = "👥",
+    ["weapon"] = "🔫",
+    ["world"] = "🌐",
+    ["local player"] = "👤",
+    ["scripts"] = "📜",
+    ["config"] = "⚙",
 }
 
 local function Create(class, properties, children)
@@ -37,7 +37,7 @@ function Neverwin.new(title)
     local self = setmetatable({}, Neverwin)
     self.LayoutCount = 0
 
-    -- Clear existing Neverwin GUIs to prevent overlap
+    -- Cleanup
     local old = (gethui and gethui():FindFirstChild("Neverwin")) or CoreGui:FindFirstChild("Neverwin")
     if old then old:Destroy() end
 
@@ -199,7 +199,7 @@ function Neverwin:CreateTab(name, icon)
     local tab = {}
     
     local lookName = string.lower(string.gsub(name, "^%s*(.-)%s*$", "%1"))
-    icon = icon or Neverwin.Icons[lookName] or "rbxassetid://6031763426"
+    icon = icon or Neverwin.Icons[lookName] or "🏠"
 
     local button = Create("TextButton", {
         Name = name,
@@ -221,13 +221,15 @@ function Neverwin:CreateTab(name, icon)
         Create("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 10), VerticalAlignment = Enum.VerticalAlignment.Center })
     })
 
-    local iconLabel = Create("ImageLabel", {
+    local iconLabel = Create("TextLabel", {
         Name = "Icon",
         Parent = btnContent,
         BackgroundTransparency = 1,
-        Size = UDim2.new(0, 16, 0, 16),
-        Image = icon,
-        ImageColor3 = Color3.fromRGB(180, 180, 180) -- Default to gray, will turn blue when active
+        Size = UDim2.new(0, 18, 0, 18),
+        Font = Enum.Font.GothamSemibold,
+        Text = icon,
+        TextColor3 = Color3.fromRGB(180, 180, 180),
+        TextSize = 16
     })
 
     local textLabel = Create("TextLabel", {
@@ -453,7 +455,7 @@ function Neverwin:SelectTab(name)
         local isCurrent = t.button.Name == name
         t.container.Visible = isCurrent
         TweenService:Create(t.label, TweenInfo.new(0.2), { TextColor3 = isCurrent and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 180) }):Play()
-        TweenService:Create(t.icon, TweenInfo.new(0.2), { ImageColor3 = isCurrent and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(180, 180, 180) }):Play()
+        TweenService:Create(t.icon, TweenInfo.new(0.2), { TextColor3 = isCurrent and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(180, 180, 180) }):Play()
     end
 end
 
@@ -492,16 +494,23 @@ function Neverwin:CreateCharacterPreview()
         ZIndex = 6
     })
 
+    local worldModel = Instance.new("WorldModel")
+    worldModel.Parent = viewport
+
     local cam = Instance.new("Camera")
     viewport.CurrentCamera = cam
     cam.Parent = viewport
-    -- Point camera at the character and pull BACK further
-    cam.CFrame = CFrame.new(Vector3.new(0, 1.2, 11), Vector3.new(0, 0.5, 0))
-
+    
     local baconId = 45184511
     local model = Players:CreateHumanoidModelFromUserId(baconId)
-    model.Parent = viewport
-    model:SetPrimaryPartCFrame(CFrame.new(Vector3.new(0, 0, 0)) * CFrame.Angles(0, math.rad(180), 0))
+    model.Parent = worldModel
+    
+    -- Centering fix: Use GetBoundingBox to center correctly
+    local cf, size = model:GetBoundingBox()
+    model:SetPrimaryPartCFrame(CFrame.new(-cf.Position) * CFrame.Angles(0, math.rad(180), 0))
+    
+    -- Camera positioning for full body
+    cam.CFrame = CFrame.new(Vector3.new(0, 0, 13), Vector3.new(0, 0, 0))
 
     local rotating = false
     local lastMousePos
