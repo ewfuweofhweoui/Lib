@@ -444,6 +444,126 @@ function Neverwin:CreateTab(name, icon)
             return slider
         end
 
+        function section:CreateColorPicker(text, default, callback)
+            local picker = Create("Frame", {
+                Name = text,
+                Parent = frame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, -20, 0, 30),
+                LayoutOrder = #frame:GetChildren()
+            })
+
+            local label = Create("TextLabel", {
+                Parent = picker,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, -40, 1, 0),
+                Font = Enum.Font.Gotham,
+                Text = text,
+                TextColor3 = Color3.fromRGB(200, 200, 200),
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            local colorPreview = Create("Frame", {
+                Parent = picker,
+                BackgroundColor3 = default,
+                Position = UDim2.new(1, -30, 0.5, -10),
+                Size = UDim2.new(0, 25, 0, 20),
+                BorderSizePixel = 0
+            }, { Create("UICorner", { CornerRadius = UDim.new(0, 4) }) })
+
+            local btn = Create("TextButton", {
+                Parent = picker,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Text = ""
+            })
+
+            local open = false
+            local pickerFrame = Create("Frame", {
+                Parent = picker,
+                BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+                Position = UDim2.new(0, 0, 1, 5),
+                Size = UDim2.new(1, 0, 0, 100),
+                Visible = false,
+                ZIndex = 10
+            }, { 
+                Create("UICorner", { CornerRadius = UDim.new(0, 5) }),
+                Create("UIListLayout", { Padding = UDim.new(0, 5), HorizontalAlignment = Enum.HorizontalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder }),
+                Create("UIPadding", { PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5) })
+            })
+
+            local function createRGBSlider(name, colorComp, min, max, cb)
+                local sFrame = Create("Frame", {
+                    Parent = pickerFrame,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.9, 0, 0, 25),
+                    ZIndex = 11
+                })
+                Create("TextLabel", {
+                    Parent = sFrame,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0, 20, 1, 0),
+                    Font = Enum.Font.GothamBold,
+                    Text = name,
+                    TextColor3 = Color3.fromRGB(255, 255, 255),
+                    TextSize = 12,
+                    ZIndex = 11
+                })
+                local bar = Create("Frame", {
+                    Parent = sFrame,
+                    BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+                    Position = UDim2.new(0, 25, 0.5, -2),
+                    Size = UDim2.new(1, -30, 0, 4),
+                    ZIndex = 11
+                })
+                local fill = Create("Frame", {
+                    Parent = bar,
+                    BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+                    Size = UDim2.new(colorComp / 255, 0, 1, 0),
+                    ZIndex = 12
+                })
+                local hit = Create("TextButton", {
+                    Parent = sFrame,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 1, 0),
+                    Text = "",
+                    ZIndex = 13
+                })
+                local dragging = false
+                local function move(input)
+                    local pos = math.clamp((input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1)
+                    fill.Size = UDim2.new(pos, 0, 1, 0)
+                    cb(math.floor(pos * 255))
+                end
+                hit.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true move(input) end end)
+                UserInputService.InputChanged:Connect(function(input) if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then move(input) end end)
+                UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
+            end
+
+            local currColor = default
+            local r, g, b = math.floor(default.R * 255), math.floor(default.G * 255), math.floor(default.B * 255)
+            
+            local function update()
+                currColor = Color3.fromRGB(r, g, b)
+                colorPreview.BackgroundColor3 = currColor
+                callback(currColor)
+            end
+
+            createRGBSlider("R", r, 0, 255, function(v) r = v update() end)
+            createRGBSlider("G", g, 0, 255, function(v) g = v update() end)
+            createRGBSlider("B", b, 0, 255, function(v) b = v update() end)
+
+            btn.MouseButton1Click:Connect(function()
+                open = not open
+                pickerFrame.Visible = open
+                frame.Size = UDim2.new(0.9, 0, 0, frame.UIListLayout.AbsoluteContentSize.Y + 20)
+            end)
+
+            frame.Size = UDim2.new(0.9, 0, 0, frame.UIListLayout.AbsoluteContentSize.Y + 20)
+            return picker
+        end
+
         return section
     end
 
